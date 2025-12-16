@@ -1,9 +1,5 @@
-/**
- * UNAMBA Analytics - Data Context
- * Global state management for student data and analytics
- */
-
 import { createContext, useContext, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { normalizeStudentData, mergeSheets, validateStudentData } from '../utils/excelParser';
 
 const DataContext = createContext();
@@ -17,6 +13,7 @@ export const useData = () => {
 };
 
 export const DataProvider = ({ children }) => {
+    const navigate = useNavigate();
     const [rawData, setRawData] = useState(null);
     const [students, setStudents] = useState([]);
     const [selectedSheet, setSelectedSheet] = useState(null);
@@ -31,35 +28,29 @@ export const DataProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    /**
-     * Load data from parsed Excel
-     */
     const loadData = useCallback((parsedData) => {
         try {
             setIsLoading(true);
             setError(null);
             setRawData(parsedData);
 
-            // If there's only one sheet, select it automatically
             if (parsedData.sheetNames.length === 1) {
                 const sheetName = parsedData.sheetNames[0];
                 selectSheet(sheetName, parsedData);
             } else {
-                // Merge all sheets by default
                 const merged = mergeSheets(parsedData.sheets);
                 setStudents(merged);
             }
 
             setIsLoading(false);
+            
+            navigate('/admin/resumen');
         } catch (err) {
             setError(`Error loading data: ${err.message}`);
             setIsLoading(false);
         }
-    }, []);
+    }, [navigate]);
 
-    /**
-     * Select a specific sheet to analyze
-     */
     const selectSheet = useCallback((sheetName, data = rawData) => {
         if (!data || !data.sheets[sheetName]) {
             setError(`Sheet "${sheetName}" not found`);
@@ -69,7 +60,6 @@ export const DataProvider = ({ children }) => {
         setSelectedSheet(sheetName);
         const normalized = normalizeStudentData(data.sheets[sheetName].data);
 
-        // Validate data
         const validation = validateStudentData(normalized);
         if (!validation.isValid) {
             console.warn('Data validation warnings:', validation.warnings);
@@ -78,9 +68,6 @@ export const DataProvider = ({ children }) => {
         setStudents(normalized);
     }, [rawData]);
 
-    /**
-     * Merge all sheets
-     */
     const mergeAllSheets = useCallback(() => {
         if (!rawData) return;
 
@@ -89,16 +76,11 @@ export const DataProvider = ({ children }) => {
         setStudents(merged);
     }, [rawData]);
 
-    /**
-     * Update filters
-     */
     const updateFilters = useCallback((newFilters) => {
         setFilters(prev => ({ ...prev, ...newFilters }));
     }, []);
 
-    /**
-     * Reset filters
-     */
+
     const resetFilters = useCallback(() => {
         setFilters({
             carrera: null,
@@ -110,9 +92,6 @@ export const DataProvider = ({ children }) => {
         });
     }, []);
 
-    /**
-     * Get filtered students based on current filters
-     */
     const getFilteredStudents = useCallback(() => {
         let filtered = [...students];
 
@@ -154,9 +133,6 @@ export const DataProvider = ({ children }) => {
         return filtered;
     }, [students, filters]);
 
-    /**
-     * Get unique values for filters
-     */
     const getUniqueValues = useCallback((field) => {
         const values = new Set();
         students.forEach(student => {
@@ -167,9 +143,6 @@ export const DataProvider = ({ children }) => {
         return Array.from(values).sort();
     }, [students]);
 
-    /**
-     * Clear all data
-     */
     const clearData = useCallback(() => {
         setRawData(null);
         setStudents([]);
@@ -179,7 +152,6 @@ export const DataProvider = ({ children }) => {
     }, [resetFilters]);
 
     const value = {
-        // Data
         rawData,
         students,
         selectedSheet,
@@ -187,7 +159,6 @@ export const DataProvider = ({ children }) => {
         isLoading,
         error,
 
-        // Methods
         loadData,
         selectSheet,
         mergeAllSheets,
@@ -197,7 +168,6 @@ export const DataProvider = ({ children }) => {
         getUniqueValues,
         clearData,
 
-        // Computed
         hasData: students.length > 0,
         totalStudents: students.length,
         sheets: rawData?.sheets || {},

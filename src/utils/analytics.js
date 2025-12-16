@@ -1,15 +1,4 @@
-/**
- * UNAMBA Analytics - Analytics Utility Functions
- * Statistical analysis and data processing for admission results
- */
 
-/**
- * Get top N students by score
- * @param {Array} students - Array of student data
- * @param {Number} n - Number of top students to return
- * @param {String} carrera - Optional: filter by career
- * @returns {Array} - Top students sorted by score
- */
 export const getTopStudents = (students, n = 10, carrera = null) => {
     let filtered = [...students];
 
@@ -23,21 +12,12 @@ export const getTopStudents = (students, n = 10, carrera = null) => {
         .slice(0, n);
 };
 
-/**
- * Get the best student overall
- * @param {Array} students - Array of student data
- * @returns {Object} - Top student with metadata
- */
 export const getBestStudent = (students) => {
     const top = getTopStudents(students, 1);
     return top.length > 0 ? top[0] : null;
 };
 
-/**
- * Calculate statistics by career
- * @param {Array} students - Array of student data
- * @returns {Object} - Statistics grouped by career
- */
+
 export const getCareerStats = (students) => {
     const careerMap = {};
 
@@ -60,7 +40,6 @@ export const getCareerStats = (students) => {
         }
     });
 
-    // Calculate statistics for each career
     Object.keys(careerMap).forEach(carrera => {
         const stats = careerMap[carrera];
         const scores = stats.puntajes;
@@ -85,11 +64,7 @@ export const getCareerStats = (students) => {
     return careerMap;
 };
 
-/**
- * Get overall statistics
- * @param {Array} students - Array of student data
- * @returns {Object} - Overall statistics
- */
+
 export const getOverallStats = (students) => {
     const scores = students
         .filter(s => s.puntaje !== null && s.puntaje !== undefined)
@@ -118,12 +93,7 @@ export const getOverallStats = (students) => {
     };
 };
 
-/**
- * Calculate score distribution (histogram data)
- * @param {Array} students - Array of student data
- * @param {Number} bins - Number of bins for distribution
- * @returns {Array} - Distribution data
- */
+
 export const getScoreDistribution = (students, bins = 10) => {
     const scores = students
         .filter(s => s.puntaje !== null && s.puntaje !== undefined)
@@ -153,12 +123,7 @@ export const getScoreDistribution = (students, bins = 10) => {
     return distribution;
 };
 
-/**
- * Calculate percentile for a given score
- * @param {Array} students - Array of student data
- * @param {Number} score - Score to calculate percentile for
- * @returns {Number} - Percentile (0-100)
- */
+
 export const calculatePercentile = (students, score) => {
     const scores = students
         .filter(s => s.puntaje !== null && s.puntaje !== undefined)
@@ -171,11 +136,7 @@ export const calculatePercentile = (students, score) => {
     return (belowOrEqual / scores.length) * 100;
 };
 
-/**
- * Get gender distribution
- * @param {Array} students - Array of student data
- * @returns {Object} - Gender statistics
- */
+
 export const getGenderDistribution = (students) => {
     const distribution = {
         Masculino: 0,
@@ -200,11 +161,6 @@ export const getGenderDistribution = (students) => {
     return distribution;
 };
 
-/**
- * Get regional distribution
- * @param {Array} students - Array of student data
- * @returns {Object} - Regional statistics
- */
 export const getRegionalDistribution = (students) => {
     const distribution = {};
 
@@ -222,12 +178,6 @@ export const getRegionalDistribution = (students) => {
         .sort((a, b) => b.count - a.count);
 };
 
-/**
- * Compare careers by multiple metrics
- * @param {Array} students - Array of student data
- * @param {Array} careers - Array of career names to compare
- * @returns {Object} - Comparison data
- */
 export const compareCareers = (students, careers) => {
     const comparison = {
         careers: careers,
@@ -256,12 +206,6 @@ export const compareCareers = (students, careers) => {
     return comparison;
 };
 
-/**
- * Search students by name, DNI, or career
- * @param {Array} students - Array of student data
- * @param {String} query - Search query
- * @returns {Array} - Filtered students
- */
 export const searchStudents = (students, query) => {
     if (!query) return students;
 
@@ -280,7 +224,6 @@ export const searchStudents = (students, query) => {
     });
 };
 
-// Helper functions
 const calculateMedian = (numbers) => {
     const sorted = [...numbers].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
@@ -296,12 +239,6 @@ const calculateStdDev = (numbers) => {
     return Math.sqrt(avgSquareDiff);
 };
 
-/**
- * Get ranking with position numbers
- * @param {Array} students - Array of student data
- * @param {String} carrera - Optional: filter by career
- * @returns {Array} - Ranked students
- */
 export const getRanking = (students, carrera = null) => {
     let filtered = [...students];
 
