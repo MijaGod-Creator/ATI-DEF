@@ -1,4 +1,4 @@
-import { Line } from 'react-chartjs-2';
+﻿import { Line } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -29,19 +29,19 @@ const DistributionChart = ({ bins = 10 }) => {
                 data: distribution.map(d => d.count),
                 fill: true,
                 backgroundColor: (context) => {
-                    const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(79, 172, 254, 0.3)');
-                    gradient.addColorStop(1, 'rgba(79, 172, 254, 0.01)');
+                    const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 300);
+                    gradient.addColorStop(0, 'rgba(17, 24, 39, 0.2)');
+                    gradient.addColorStop(1, 'rgba(17, 24, 39, 0.01)');
                     return gradient;
                 },
-                borderColor: 'rgba(79, 172, 254, 1)',
-                borderWidth: 3,
+                borderColor: '#111827',
+                borderWidth: 2,
                 tension: 0.4,
-                pointBackgroundColor: 'rgba(79, 172, 254, 1)',
+                pointBackgroundColor: '#111827',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
+                pointRadius: 4,
+                pointHoverRadius: 6,
             }
         ]
     };
@@ -54,23 +54,16 @@ const DistributionChart = ({ bins = 10 }) => {
                 display: false
             },
             title: {
-                display: true,
-                text: 'Distribución de Puntajes',
-                color: '#f9fafb',
-                font: {
-                    size: 18,
-                    weight: 'bold'
-                },
-                padding: 20
+                display: false
             },
             tooltip: {
-                backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                titleColor: '#f9fafb',
-                bodyColor: '#d1d5db',
-                borderColor: 'rgba(79, 172, 254, 0.5)',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#111827',
+                bodyColor: '#6b7280',
+                borderColor: '#e5e7eb',
                 borderWidth: 1,
                 padding: 12,
-                cornerRadius: 8,
+                cornerRadius: 6,
                 callbacks: {
                     label: (context) => {
                         const dist = distribution[context.dataIndex];
@@ -86,13 +79,13 @@ const DistributionChart = ({ bins = 10 }) => {
             y: {
                 beginAtZero: true,
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.05)',
+                    color: '#f3f4f6',
                     drawBorder: false
                 },
                 ticks: {
-                    color: '#9ca3af',
+                    color: '#6b7280',
                     font: {
-                        size: 12
+                        size: 11
                     },
                     precision: 0
                 }
@@ -102,7 +95,7 @@ const DistributionChart = ({ bins = 10 }) => {
                     display: false
                 },
                 ticks: {
-                    color: '#9ca3af',
+                    color: '#6b7280',
                     font: {
                         size: 11
                     },
@@ -115,17 +108,24 @@ const DistributionChart = ({ bins = 10 }) => {
 
     if (distribution.length === 0) {
         return (
-            <div className="chart-container glass-card">
-                <div className="no-data">
-                    <p>📊 No hay datos disponibles</p>
+            <div className="chart-container">
+                <div className="chart-header">
+                    <h3 className="chart-title">Distribución de Puntajes</h3>
+                </div>
+                <div className="p-8 text-center">
+                    <p className="text-sm text-gray-500">No hay datos disponibles</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="chart-container glass-card">
-            <div className="chart-wrapper">
+        <div className="chart-container">
+            <div className="chart-header">
+                <h3 className="chart-title">Distribución de Puntajes</h3>
+                <p className="chart-subtitle">Frecuencia de estudiantes por rango de puntaje</p>
+            </div>
+            <div className="h-[400px]">
                 <Line data={data} options={options} />
             </div>
         </div>

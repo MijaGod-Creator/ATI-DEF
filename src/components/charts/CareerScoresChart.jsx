@@ -1,4 +1,4 @@
-import { Bar } from 'react-chartjs-2';
+﻿import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -24,12 +24,12 @@ const CareerScoresChart = () => {
     );
 
     const colors = [
-        'rgba(102, 126, 234, 0.8)',
-        'rgba(118, 75, 162, 0.8)',
-        'rgba(79, 172, 254, 0.8)',
-        'rgba(250, 112, 154, 0.8)',
-        'rgba(254, 215, 102, 0.8)',
-        'rgba(129, 140, 248, 0.8)',
+        '#111827',
+        '#374151',
+        '#4b5563',
+        '#6b7280',
+        '#9ca3af',
+        '#d1d5db',
     ];
 
     const data = {
@@ -39,9 +39,9 @@ const CareerScoresChart = () => {
                 label: 'Puntaje Promedio',
                 data: careers.map(c => careerStats[c].avg),
                 backgroundColor: careers.map((_, i) => colors[i % colors.length]),
-                borderColor: careers.map((_, i) => colors[i % colors.length].replace('0.8', '1')),
-                borderWidth: 2,
-                borderRadius: 8,
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                borderRadius: 6,
             }
         ]
     };
@@ -54,23 +54,16 @@ const CareerScoresChart = () => {
                 display: false
             },
             title: {
-                display: true,
-                text: 'Puntajes Promedio por Carrera',
-                color: '#f9fafb',
-                font: {
-                    size: 18,
-                    weight: 'bold'
-                },
-                padding: 20
+                display: false
             },
             tooltip: {
-                backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                titleColor: '#f9fafb',
-                bodyColor: '#d1d5db',
-                borderColor: 'rgba(102, 126, 234, 0.5)',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#111827',
+                bodyColor: '#6b7280',
+                borderColor: '#e5e7eb',
                 borderWidth: 1,
                 padding: 12,
-                cornerRadius: 8,
+                cornerRadius: 6,
                 callbacks: {
                     title: (items) => {
                         const careerName = careers[items[0].dataIndex];
@@ -93,13 +86,13 @@ const CareerScoresChart = () => {
             y: {
                 beginAtZero: true,
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.05)',
+                    color: '#f3f4f6',
                     drawBorder: false
                 },
                 ticks: {
-                    color: '#9ca3af',
+                    color: '#6b7280',
                     font: {
-                        size: 12
+                        size: 11
                     }
                 }
             },
@@ -108,7 +101,7 @@ const CareerScoresChart = () => {
                     display: false
                 },
                 ticks: {
-                    color: '#9ca3af',
+                    color: '#6b7280',
                     font: {
                         size: 11
                     },
@@ -121,17 +114,24 @@ const CareerScoresChart = () => {
 
     if (careers.length === 0) {
         return (
-            <div className="chart-container glass-card">
-                <div className="no-data">
-                    <p>📊 No hay datos disponibles</p>
+            <div className="chart-container">
+                <div className="chart-header">
+                    <h3 className="chart-title">Puntajes por Carrera</h3>
+                </div>
+                <div className="p-8 text-center">
+                    <p className="text-sm text-gray-500">No hay datos disponibles</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="chart-container glass-card">
-            <div className="chart-wrapper">
+        <div className="chart-container">
+            <div className="chart-header">
+                <h3 className="chart-title">Puntajes Promedio por Carrera</h3>
+                <p className="chart-subtitle">Comparación de promedios entre carreras</p>
+            </div>
+            <div className="h-[400px]">
                 <Bar data={data} options={options} />
             </div>
         </div>

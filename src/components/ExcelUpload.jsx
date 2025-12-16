@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { parseExcelFile } from '../utils/excelParser';
 import { useData } from '../context/DataContext';
-import './ExcelUpload.css';
+import { Upload, CheckCircle, XCircle, Loader2, FileSpreadsheet } from 'lucide-react';
 
 const ExcelUpload = () => {
     const [isDragging, setIsDragging] = useState(false);
@@ -78,9 +78,15 @@ const ExcelUpload = () => {
     };
 
     return (
-        <div className="excel-upload">
+        <div className="excel-upload w-full">
             <div
-                className={`upload-zone ${isDragging ? 'dragging' : ''} ${uploadProgress?.status === 'success' ? 'success' : ''}`}
+                className={`relative min-h-[280px] flex items-center justify-center rounded-lg border-2 ${
+                    isDragging
+                        ? 'border-solid border-gray-400 bg-gray-50'
+                        : uploadProgress?.status === 'success'
+                        ? 'border-dashed border-green-300 bg-green-50'
+                        : 'border-dashed border-gray-300 bg-white'
+                } cursor-pointer transition-all hover:border-gray-400 hover:bg-gray-50`}
                 onDragEnter={handleDragEnter}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -96,38 +102,38 @@ const ExcelUpload = () => {
                 />
 
                 {!uploadProgress ? (
-                    <div className="upload-content">
-                        <div className="upload-icon">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
+                    <div className="text-center p-8">
+                        <div className="mb-4 flex justify-center">
+                            <Upload className="h-12 w-12 text-gray-400" />
                         </div>
-                        <h3>Cargar Archivo Excel</h3>
-                        <p>Arrastra y suelta tu archivo aquí o haz clic para seleccionar</p>
-                        <p className="file-types">Formatos soportados: .xlsx, .xls</p>
+                        <h3 className="mb-2 text-base font-semibold text-gray-900">Cargar Archivo Excel</h3>
+                        <p className="mb-1 text-sm text-gray-500">Arrastra y suelta tu archivo aquí o haz clic para seleccionar</p>
+                        <p className="text-xs text-gray-400">Formatos soportados: .xlsx, .xls</p>
                     </div>
                 ) : (
-                    <div className="upload-status">
+                    <div className="w-full p-8">
                         {uploadProgress.status === 'loading' && (
-                            <div className="loading-spinner">
-                                <div className="spinner"></div>
-                                <p>Procesando {uploadProgress.fileName}...</p>
+                            <div className="flex flex-col items-center gap-4">
+                                <Loader2 className="h-10 w-10 animate-spin text-gray-900" />
+                                <p className="text-sm font-medium text-gray-900">Procesando {uploadProgress.fileName}...</p>
                             </div>
                         )}
                         {uploadProgress.status === 'success' && (
-                            <div className="success-message">
-                                <div className="success-icon">✓</div>
-                                <p>Archivo cargado exitosamente</p>
-                                <p className="file-name">{uploadProgress.fileName}</p>
+                            <div className="flex flex-col items-center gap-3 animate-fadeIn">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                                    <CheckCircle className="h-6 w-6 text-green-600" />
+                                </div>
+                                <p className="font-medium text-gray-900">Archivo cargado exitosamente</p>
+                                <p className="text-sm text-gray-500 break-all">{uploadProgress.fileName}</p>
                             </div>
                         )}
                         {uploadProgress.status === 'error' && (
-                            <div className="error-message">
-                                <div className="error-icon">✕</div>
-                                <p>Error al cargar el archivo</p>
-                                <p className="error-detail">{uploadProgress.error}</p>
+                            <div className="flex flex-col items-center gap-3">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 border-2 border-red-200">
+                                    <XCircle className="h-6 w-6 text-red-600" />
+                                </div>
+                                <p className="font-medium text-gray-900">Error al cargar el archivo</p>
+                                <p className="text-sm text-red-600 max-w-md text-center">{uploadProgress.error}</p>
                             </div>
                         )}
                     </div>
@@ -135,20 +141,23 @@ const ExcelUpload = () => {
             </div>
 
             {rawData && (
-                <div className="file-info glass-card mt-lg">
-                    <h4>📄 Archivo Cargado</h4>
-                    <div className="info-grid">
-                        <div className="info-item">
-                            <span className="label">Nombre:</span>
-                            <span className="value">{rawData.fileName}</span>
+                <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm animate-fadeIn">
+                    <h4 className="mb-4 text-sm font-semibold text-gray-900 flex items-center gap-2">
+                        <FileSpreadsheet className="h-4 w-4" />
+                        Archivo Cargado
+                    </h4>
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center rounded-md bg-gray-50 px-3 py-2">
+                            <span className="text-xs font-medium text-gray-600">Nombre:</span>
+                            <span className="text-xs text-gray-900 font-medium">{rawData.fileName}</span>
                         </div>
-                        <div className="info-item">
-                            <span className="label">Hojas:</span>
-                            <span className="value">{rawData.totalSheets}</span>
+                        <div className="flex justify-between items-center rounded-md bg-gray-50 px-3 py-2">
+                            <span className="text-xs font-medium text-gray-600">Hojas:</span>
+                            <span className="text-xs text-gray-900 font-medium">{rawData.totalSheets}</span>
                         </div>
-                        <div className="info-item">
-                            <span className="label">Hojas disponibles:</span>
-                            <span className="value">{rawData.sheetNames.join(', ')}</span>
+                        <div className="flex justify-between items-center rounded-md bg-gray-50 px-3 py-2">
+                            <span className="text-xs font-medium text-gray-600">Hojas disponibles:</span>
+                            <span className="text-xs text-gray-900 font-medium text-right">{rawData.sheetNames.join(', ')}</span>
                         </div>
                     </div>
                 </div>

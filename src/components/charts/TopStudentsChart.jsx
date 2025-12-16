@@ -29,16 +29,11 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
             {
                 label: 'Puntaje',
                 data: topStudents.map(s => s.puntaje),
-                backgroundColor: (context) => {
-                    const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)');
-                    gradient.addColorStop(1, 'rgba(118, 75, 162, 0.8)');
-                    return gradient;
-                },
-                borderColor: 'rgba(102, 126, 234, 1)',
-                borderWidth: 2,
-                borderRadius: 8,
-                hoverBackgroundColor: 'rgba(102, 126, 234, 1)',
+                backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                borderColor: 'rgba(17, 24, 39, 1)',
+                borderWidth: 1,
+                borderRadius: 6,
+                hoverBackgroundColor: 'rgba(17, 24, 39, 0.9)',
             }
         ]
     };
@@ -51,23 +46,16 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
                 display: false
             },
             title: {
-                display: true,
-                text: carrera ? `Top ${count} Estudiantes - ${carrera}` : `Top ${count} Estudiantes`,
-                color: '#f9fafb',
-                font: {
-                    size: 18,
-                    weight: 'bold'
-                },
-                padding: 20
+                display: false
             },
             tooltip: {
-                backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                titleColor: '#f9fafb',
-                bodyColor: '#d1d5db',
-                borderColor: 'rgba(102, 126, 234, 0.5)',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#111827',
+                bodyColor: '#6b7280',
+                borderColor: '#e5e7eb',
                 borderWidth: 1,
                 padding: 12,
-                cornerRadius: 8,
+                cornerRadius: 6,
                 callbacks: {
                     afterLabel: (context) => {
                         const student = topStudents[context.dataIndex];
@@ -83,13 +71,13 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
             y: {
                 beginAtZero: true,
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.05)',
+                    color: '#f3f4f6',
                     drawBorder: false
                 },
                 ticks: {
-                    color: '#9ca3af',
+                    color: '#6b7280',
                     font: {
-                        size: 12
+                        size: 11
                     }
                 }
             },
@@ -98,7 +86,7 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
                     display: false
                 },
                 ticks: {
-                    color: '#9ca3af',
+                    color: '#6b7280',
                     font: {
                         size: 11
                     },
@@ -111,17 +99,26 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
 
     if (topStudents.length === 0) {
         return (
-            <div className="chart-container glass-card">
-                <div className="no-data">
-                    <p>📊 No hay datos disponibles</p>
+            <div className="chart-container">
+                <div className="chart-header">
+                    <h3 className="chart-title">Top Estudiantes</h3>
+                </div>
+                <div className="p-8 text-center">
+                    <p className="text-sm text-gray-500">📊 No hay datos disponibles</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="chart-container glass-card">
-            <div className="chart-wrapper">
+        <div className="chart-container">
+            <div className="chart-header">
+                <h3 className="chart-title">
+                    {carrera ? `Top ${count} Estudiantes - ${carrera}` : `Top ${count} Estudiantes`}
+                </h3>
+                <p className="chart-subtitle">Ranking por puntaje más alto</p>
+            </div>
+            <div className="h-[400px]">
                 <Bar data={data} options={options} />
             </div>
         </div>
