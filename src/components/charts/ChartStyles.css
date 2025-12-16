@@ -1,0 +1,104 @@
+/* Chart Styles - Shared across all chart components */
+
+.chart-container {
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: var(--text-tertiary);
+    font-size: 1.125rem;
+}
+
+.no-data p {
+    margin: 0;
+}
+
+/* Career Selector for Comparison Chart */
+.career-selector h4 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    font-size: 1rem;
+}
+
+.career-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.career-chip {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--bg-elevated);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.career-chip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-gradient);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    z-index: -1;
+}
+
+.career-chip:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.career-chip.active {
+    background: var(--primary-gradient);
+    border-color: transparent;
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.career-chip.active::before {
+    opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chart-container {
+        padding: var(--spacing-lg);
+    }
+
+    .chart-wrapper {
+        height: 300px;
+    }
+
+    .career-chip {
+        font-size: 0.75rem;
+        padding: var(--spacing-xs) var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-wrapper {
+        height: 250px;
+    }
+}

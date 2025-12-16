@@ -1,0 +1,252 @@
+.ranking-table {
+    padding: var(--spacing-xl);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.table-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.table-header h3 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.table-controls {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.search-input,
+.career-filter {
+    flex: 1;
+    min-width: 200px;
+}
+
+.table-info {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+}
+
+.table-info p {
+    margin: 0;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--glass-border);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-elevated);
+}
+
+thead {
+    background: var(--bg-tertiary);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+thead tr {
+    border-bottom: 2px solid var(--glass-border);
+}
+
+th {
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-align: left;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--transition-base);
+}
+
+th.sortable:hover {
+    color: var(--primary-light);
+    background: rgba(102, 126, 234, 0.1);
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--glass-border);
+    transition: all var(--transition-fast);
+}
+
+tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+tbody tr.top-rank {
+    background: rgba(255, 217, 61, 0.05);
+}
+
+tbody tr.top-rank:hover {
+    background: rgba(255, 217, 61, 0.1);
+}
+
+td {
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.rank-cell {
+    font-weight: 700;
+}
+
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+}
+
+.medal {
+    font-size: 1.125rem;
+}
+
+.name-cell {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.career-cell {
+    max-width: 250px;
+}
+
+.career-tag {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.score-cell {
+    font-size: 1rem;
+}
+
+.score-cell strong {
+    color: var(--primary-light);
+    font-weight: 700;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+    flex-wrap: wrap;
+}
+
+.pagination button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 40px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: all var(--transition-base);
+}
+
+.pagination button:hover:not(:disabled) {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination button.active {
+    background: var(--primary-gradient);
+    border-color: transparent;
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.page-numbers {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: var(--text-tertiary);
+    font-size: 1.125rem;
+}
+
+.no-data p {
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ranking-table {
+        padding: var(--spacing-lg);
+    }
+
+    .table-controls {
+        flex-direction: column;
+    }
+
+    .search-input,
+    .career-filter {
+        width: 100%;
+    }
+
+    th,
+    td {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.75rem;
+    }
+
+    .career-tag {
+        font-size: 0.625rem;
+    }
+
+    .pagination {
+        gap: var(--spacing-sm);
+    }
+
+    .pagination button {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        min-width: 36px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Hide less important columns on mobile */
+    td:nth-child(3),
+    th:nth-child(3) {
+        display: none;
+    }
+}
