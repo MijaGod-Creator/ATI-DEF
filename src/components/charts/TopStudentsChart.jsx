@@ -10,7 +10,6 @@ import {
 } from 'chart.js';
 import { useData } from '../../context/DataContext';
 import { getTopStudents } from '../../utils/analytics';
-import './ChartStyles.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -20,25 +19,19 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
     const topStudents = getTopStudents(students, count, carrera);
 
     const data = {
-        labels: topStudents.map(s => {
-            const nombre = s.nombre || 'Sin nombre';
-            const apellido = s.apellido || '';
-            return `${nombre} ${apellido}`.trim().substring(0, 20);
-        }),
+        labels: topStudents.map((s, i) => `#${i + 1}`),
         datasets: [
             {
                 label: 'Puntaje',
                 data: topStudents.map(s => s.puntaje),
-                backgroundColor: (context) => {
-                    const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)');
-                    gradient.addColorStop(1, 'rgba(118, 75, 162, 0.8)');
-                    return gradient;
-                },
-                borderColor: 'rgba(102, 126, 234, 1)',
+                backgroundColor: topStudents.map((s, i) => {
+                    const opacity = 0.9 - (i * 0.05);
+                    return `rgba(59, 130, 246, ${opacity})`;
+                }),
+                borderColor: '#3b82f6',
                 borderWidth: 2,
                 borderRadius: 8,
-                hoverBackgroundColor: 'rgba(102, 126, 234, 1)',
+                hoverBackgroundColor: '#3b82f6',
             }
         ]
     };
@@ -50,28 +43,25 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
             legend: {
                 display: false
             },
-            title: {
-                display: true,
-                text: carrera ? `Top ${count} Estudiantes - ${carrera}` : `Top ${count} Estudiantes`,
-                color: '#f9fafb',
-                font: {
-                    size: 18,
-                    weight: 'bold'
-                },
-                padding: 20
-            },
             tooltip: {
                 backgroundColor: 'rgba(17, 24, 39, 0.95)',
                 titleColor: '#f9fafb',
                 bodyColor: '#d1d5db',
-                borderColor: 'rgba(102, 126, 234, 0.5)',
+                borderColor: 'rgba(59, 130, 246, 0.5)',
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8,
                 callbacks: {
-                    afterLabel: (context) => {
+                    title: (context) => {
+                        const student = topStudents[context[0].dataIndex];
+                        const nombre = student.nombre || 'Sin nombre';
+                        const apellido = student.apellido || '';
+                        return `${nombre} ${apellido}`.trim();
+                    },
+                    label: (context) => {
                         const student = topStudents[context.dataIndex];
                         return [
+                            `Puntaje: ${student.puntaje.toFixed(2)}`,
                             student.carrera ? `Carrera: ${student.carrera}` : '',
                             student.dni ? `DNI: ${student.dni}` : ''
                         ].filter(Boolean);
@@ -88,22 +78,14 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
                 },
                 ticks: {
                     color: '#9ca3af',
-                    font: {
-                        size: 12
-                    }
+                    font: { size: 12 }
                 }
             },
             x: {
-                grid: {
-                    display: false
-                },
+                grid: { display: false },
                 ticks: {
                     color: '#9ca3af',
-                    font: {
-                        size: 11
-                    },
-                    maxRotation: 45,
-                    minRotation: 45
+                    font: { size: 12 }
                 }
             }
         }
@@ -111,17 +93,25 @@ const TopStudentsChart = ({ count = 10, carrera = null }) => {
 
     if (topStudents.length === 0) {
         return (
-            <div className="chart-container glass-card">
-                <div className="no-data">
-                    <p>📊 No hay datos disponibles</p>
+            <div className="bg-card-dark rounded-3xl p-6 md:p-8 border border-white/5">
+                <div className="text-center text-text-secondary py-12">
+                    📊 No hay datos disponibles
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="chart-container glass-card">
-            <div className="chart-wrapper">
+        <div className="bg-card-dark rounded-3xl p-6 md:p-8 border border-white/5">
+            <div className="mb-6">
+                <h3 className="text-white text-xl font-bold">
+                    {carrera ? `Top ${count} - ${carrera}` : `Top ${count} Estudiantes`}
+                </h3>
+                <p className="text-text-secondary text-sm mt-1">
+                    Mejores puntajes del proceso de admisión
+                </p>
+            </div>
+            <div className="h-80">
                 <Bar data={data} options={options} />
             </div>
         </div>

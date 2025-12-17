@@ -10,7 +10,6 @@ import {
 } from 'chart.js';
 import { useData } from '../../context/DataContext';
 import { getCareerStats } from '../../utils/analytics';
-import './ChartStyles.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -19,29 +18,29 @@ const CareerScoresChart = () => {
     const students = getFilteredStudents();
     const careerStats = getCareerStats(students);
 
-    const careers = Object.keys(careerStats).sort((a, b) =>
-        careerStats[b].avg - careerStats[a].avg
-    );
-
-    const colors = [
-        'rgba(102, 126, 234, 0.8)',
-        'rgba(118, 75, 162, 0.8)',
-        'rgba(79, 172, 254, 0.8)',
-        'rgba(250, 112, 154, 0.8)',
-        'rgba(254, 215, 102, 0.8)',
-        'rgba(129, 140, 248, 0.8)',
-    ];
+    // Get top 8 careers by average score
+    const topCareers = Object.entries(careerStats)
+        .sort((a, b) => b[1].avg - a[1].avg)
+        .slice(0, 8);
 
     const data = {
-        labels: careers.map(c => c.length > 25 ? c.substring(0, 25) + '...' : c),
+        labels: topCareers.map(([career]) => career.length > 20 ? career.substring(0, 20) + '...' : career),
         datasets: [
             {
-                label: 'Puntaje Promedio',
-                data: careers.map(c => careerStats[c].avg),
-                backgroundColor: careers.map((_, i) => colors[i % colors.length]),
-                borderColor: careers.map((_, i) => colors[i % colors.length].replace('0.8', '1')),
+                label: 'Promedio',
+                data: topCareers.map(([_, stats]) => stats.avg),
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                borderColor: '#3b82f6',
                 borderWidth: 2,
-                borderRadius: 8,
+                borderRadius: 6,
+            },
+            {
+                label: 'Máximo',
+                data: topCareers.map(([_, stats]) => stats.max),
+                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                borderColor: '#10b981',
+                borderWidth: 2,
+                borderRadius: 6,
             }
         ]
     };
@@ -51,39 +50,32 @@ const CareerScoresChart = () => {
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: false
-            },
-            title: {
                 display: true,
-                text: 'Puntajes Promedio por Carrera',
-                color: '#f9fafb',
-                font: {
-                    size: 18,
-                    weight: 'bold'
-                },
-                padding: 20
+                position: 'top',
+                labels: {
+                    color: '#d1d5db',
+                    font: { size: 12 },
+                    padding: 15,
+                    usePointStyle: true
+                }
             },
             tooltip: {
                 backgroundColor: 'rgba(17, 24, 39, 0.95)',
                 titleColor: '#f9fafb',
                 bodyColor: '#d1d5db',
-                borderColor: 'rgba(102, 126, 234, 0.5)',
+                borderColor: 'rgba(59, 130, 246, 0.5)',
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8,
                 callbacks: {
-                    title: (items) => {
-                        const careerName = careers[items[0].dataIndex];
-                        return careerName;
-                    },
-                    label: (context) => {
-                        const careerName = careers[context.dataIndex];
-                        const stats = careerStats[careerName];
+                    afterBody: (context) => {
+                        const index = context[0].dataIndex;
+                        const [_, stats] = topCareers[index];
                         return [
-                            `Promedio: ${stats.avg.toFixed(2)}`,
-                            `Máximo: ${stats.max.toFixed(2)}`,
+                            ``,
+                            `Estudiantes: ${stats.count}`,
                             `Mínimo: ${stats.min.toFixed(2)}`,
-                            `Estudiantes: ${stats.count}`
+                            `Mediana: ${stats.median.toFixed(2)}`
                         ];
                     }
                 }
@@ -98,20 +90,14 @@ const CareerScoresChart = () => {
                 },
                 ticks: {
                     color: '#9ca3af',
-                    font: {
-                        size: 12
-                    }
+                    font: { size: 12 }
                 }
             },
             x: {
-                grid: {
-                    display: false
-                },
+                grid: { display: false },
                 ticks: {
                     color: '#9ca3af',
-                    font: {
-                        size: 11
-                    },
+                    font: { size: 11 },
                     maxRotation: 45,
                     minRotation: 45
                 }
@@ -119,19 +105,25 @@ const CareerScoresChart = () => {
         }
     };
 
-    if (careers.length === 0) {
+    if (topCareers.length === 0) {
         return (
-            <div className="chart-container glass-card">
-                <div className="no-data">
-                    <p>📊 No hay datos disponibles</p>
+            <div className="bg-card-dark rounded-3xl p-6 md:p-8 border border-white/5">
+                <div className="text-center text-text-secondary py-12">
+                    📊 No hay datos disponibles
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="chart-container glass-card">
-            <div className="chart-wrapper">
+        <div className="bg-card-dark rounded-3xl p-6 md:p-8 border border-white/5">
+            <div className="mb-6">
+                <h3 className="text-white text-xl font-bold">Puntajes por Carrera</h3>
+                <p className="text-text-secondary text-sm mt-1">
+                    Comparativa de puntajes promedio y máximo
+                </p>
+            </div>
+            <div className="h-80">
                 <Bar data={data} options={options} />
             </div>
         </div>

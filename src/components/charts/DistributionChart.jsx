@@ -1,47 +1,46 @@
-import { Line } from 'react-chartjs-2';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler
-} from 'chart.js';
+import React from 'react';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useData } from '../../context/DataContext';
-import { getScoreDistribution } from '../../utils/analytics';
-import './ChartStyles.css';
+import { getCareerStats } from '../../utils/analytics';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-const DistributionChart = ({ bins = 10 }) => {
+const DistributionChart = () => {
     const { getFilteredStudents } = useData();
     const students = getFilteredStudents();
-    const distribution = getScoreDistribution(students, bins);
+    const careerStats = getCareerStats(students);
+
+    // Group by academic area (simplified categorization)
+    const areas = {
+        'Ingenierías': 0,
+        'Sociales': 0,
+        'Biomédicas': 0,
+    };
+
+    Object.entries(careerStats).forEach(([career, stats]) => {
+        const careerLower = career.toLowerCase();
+        if (careerLower.includes('ingen') || careerLower.includes('minas') || careerLower.includes('agroindustrial')) {
+            areas['Ingenierías'] += stats.count;
+        } else if (careerLower.includes('admin') || careerLower.includes('educaci') || careerLower.includes('social')) {
+            areas['Sociales'] += stats.count;
+        } else {
+            areas['Biomédicas'] += stats.count;
+        }
+    });
+
+    const totalStudents = Object.values(areas).reduce((a, b) => a + b, 0);
+    const areaData = Object.entries(areas).filter(([_, count]) => count > 0);
 
     const data = {
-        labels: distribution.map(d => d.range),
+        labels: areaData.map(([name]) => name),
         datasets: [
             {
-                label: 'Cantidad de Estudiantes',
-                data: distribution.map(d => d.count),
-                fill: true,
-                backgroundColor: (context) => {
-                    const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(79, 172, 254, 0.3)');
-                    gradient.addColorStop(1, 'rgba(79, 172, 254, 0.01)');
-                    return gradient;
-                },
-                borderColor: 'rgba(79, 172, 254, 1)',
+                data: areaData.map(([_, count]) => count),
+                backgroundColor: ['#1d4ed8', '#3b82f6', '#93c5fd'],
+                borderColor: '#1e293b',
                 borderWidth: 3,
-                tension: 0.4,
-                pointBackgroundColor: 'rgba(79, 172, 254, 1)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
+                hoverOffset: 8,
             }
         ]
     };
@@ -51,82 +50,68 @@ const DistributionChart = ({ bins = 10 }) => {
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: false
-            },
-            title: {
-                display: true,
-                text: 'Distribución de Puntajes',
-                color: '#f9fafb',
-                font: {
-                    size: 18,
-                    weight: 'bold'
-                },
-                padding: 20
+                display: false,
             },
             tooltip: {
                 backgroundColor: 'rgba(17, 24, 39, 0.95)',
                 titleColor: '#f9fafb',
                 bodyColor: '#d1d5db',
-                borderColor: 'rgba(79, 172, 254, 0.5)',
+                borderColor: 'rgba(59, 130, 246, 0.5)',
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8,
                 callbacks: {
                     label: (context) => {
-                        const dist = distribution[context.dataIndex];
-                        return [
-                            `Estudiantes: ${dist.count}`,
-                            `Porcentaje: ${dist.percentage}%`
-                        ];
+                        const value = context.parsed;
+                        const percentage = ((value / totalStudents) * 100).toFixed(1);
+                        return `${context.label}: ${value} (${percentage}%)`;
                     }
                 }
             }
         },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: {
-                    color: 'rgba(255, 255, 255, 0.05)',
-                    drawBorder: false
-                },
-                ticks: {
-                    color: '#9ca3af',
-                    font: {
-                        size: 12
-                    },
-                    precision: 0
-                }
-            },
-            x: {
-                grid: {
-                    display: false
-                },
-                ticks: {
-                    color: '#9ca3af',
-                    font: {
-                        size: 11
-                    },
-                    maxRotation: 45,
-                    minRotation: 45
-                }
-            }
-        }
+        cutout: '70%',
     };
 
-    if (distribution.length === 0) {
+    if (areaData.length === 0) {
         return (
-            <div className="chart-container glass-card">
-                <div className="no-data">
-                    <p>📊 No hay datos disponibles</p>
+            <div className="bg-card-dark rounded-3xl p-6 md:p-8 border border-white/5 flex flex-col">
+                <div className="text-center text-text-secondary py-12">
+                    📊 No hay datos disponibles
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="chart-container glass-card">
-            <div className="chart-wrapper">
-                <Line data={data} options={options} />
+        <div className="bg-card-dark rounded-3xl p-6 md:p-8 border border-white/5 flex flex-col">
+            <h3 className="text-white text-xl font-bold mb-1">Distribución por Área</h3>
+            <p className="text-text-secondary text-sm mb-6">Puntajes mayores a 14.0</p>
+
+            <div className="flex-1 flex flex-col items-center justify-center relative">
+                <div className="relative size-56">
+                    <Doughnut data={data} options={options} />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-3xl font-bold text-white">{totalStudents}</span>
+                        <span className="text-xs text-text-secondary font-medium uppercase">Estudiantes</span>
+                    </div>
+                </div>
+
+                <div className="w-full mt-8 flex flex-col gap-2">
+                    {areaData.map(([name, count], index) => {
+                        const percentage = ((count / totalStudents) * 100).toFixed(0);
+                        const colors = ['#1d4ed8', '#3b82f6', '#93c5fd'];
+
+                        return (
+                            <div key={name} className="flex justify-between items-center text-sm">
+                                <div className="flex items-center gap-2">
+                                    <div className="size-3 rounded-full" style={{ backgroundColor: colors[index] }}></div>
+                                    <span className="text-white">{name}</span>
+                                </div>
+                                <span className="font-bold text-white">{percentage}%</span>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

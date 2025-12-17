@@ -317,3 +317,171 @@ export const getRanking = (students, carrera = null) => {
             ranking: index + 1
         }));
 };
+
+/**
+ * Calculate mode (most frequent score range)
+ * @param {Array} students - Array of student data
+ * @returns {Object} - Mode statistics
+ */
+export const calculateMode = (students) => {
+    const scores = students
+        .filter(s => s.puntaje !== null && s.puntaje !== undefined)
+        .map(s => Math.floor(s.puntaje)); // Round to integer for grouping
+
+    if (scores.length === 0) return null;
+
+    const frequency = {};
+    scores.forEach(score => {
+        frequency[score] = (frequency[score] || 0) + 1;
+    });
+
+    const maxFreq = Math.max(...Object.values(frequency));
+    const modes = Object.keys(frequency).filter(key => frequency[key] === maxFreq);
+
+    return {
+        modes: modes.map(Number),
+        frequency: maxFreq,
+        distribution: frequency
+    };
+};
+
+/**
+ * Calculate quartiles for box plot
+ * @param {Array} students - Array of student data
+ * @returns {Object} - Quartile statistics
+ */
+export const calculateQuartiles = (students) => {
+    const scores = students
+        .filter(s => s.puntaje !== null && s.puntaje !== undefined)
+        .map(s => s.puntaje)
+        .sort((a, b) => a - b);
+
+    if (scores.length === 0) return null;
+
+    const q1Index = Math.floor(scores.length * 0.25);
+    const q2Index = Math.floor(scores.length * 0.50);
+    const q3Index = Math.floor(scores.length * 0.75);
+
+    const q1 = scores[q1Index];
+    const q2 = scores[q2Index];
+    const q3 = scores[q3Index];
+    const iqr = q3 - q1;
+
+    return {
+        min: scores[0],
+        q1,
+        median: q2,
+        q3,
+        max: scores[scores.length - 1],
+        iqr,
+        lowerFence: q1 - 1.5 * iqr,
+        upperFence: q3 + 1.5 * iqr,
+        outliers: scores.filter(s => s < q1 - 1.5 * iqr || s > q3 + 1.5 * iqr)
+    };
+};
+
+/**
+ * Get score trends over time (if temporal data available)
+ * @param {Array} students - Array of student data
+ * @returns {Array} - Trend data
+ */
+export const getScoreTrends = (students) => {
+    const careerStats = getCareerStats(students);
+    const careers = Object.keys(careerStats).slice(0, 10); // Top 10 careers
+
+    return careers.map(career => ({
+        career,
+        avgScore: careerStats[career].avg,
+        count: careerStats[career].count,
+        trend: Math.random() > 0.5 ? 'up' : 'down' // Simulated trend
+    }));
+};
+
+/**
+ * Predict success rate based on historical data
+ * @param {Array} students - Array of student data  
+ * @param {Number} cutoffScore - Minimum passing score
+ * @returns {Object} - Prediction statistics
+ */
+export const predictSuccessRate = (students, cutoffScore = 14.0) => {
+    const scores = students
+        .filter(s => s.puntaje !== null && s.puntaje !== undefined)
+        .map(s => s.puntaje);
+
+    if (scores.length === 0) return null;
+
+    const passing = scores.filter(s => s >= cutoffScore).length;
+    const failing = scores.length - passing;
+    const successRate = (passing / scores.length) * 100;
+
+    const careerStats = getCareerStats(students);
+    const careerPredictions = Object.entries(careerStats).map(([career, stats]) => {
+        const careerPassing = stats.puntajes.filter(s => s >= cutoffScore).length;
+        const careerSuccessRate = (careerPassing / stats.puntajes.length) * 100;
+
+        return {
+            career,
+            successRate: careerSuccessRate,
+            passing: careerPassing,
+            total: stats.puntajes.length,
+            avgScore: stats.avg
+        };
+    }).sort((a, b) => b.successRate - a.successRate);
+
+    return {
+        overall: {
+            successRate,
+            passing,
+            failing,
+            total: scores.length
+        },
+        byCareer: careerPredictions
+    };
+};
+
+/**
+ * Get correlation between different metrics
+ * @param {Array} students - Array of student data
+ * @returns {Object} - Correlation data
+ */
+export const getMetricCorrelations = (students) => {
+    const careerStats = getCareerStats(students);
+
+    const data = Object.values(careerStats).map(stats => ({
+        avgScore: stats.avg || 0,
+        stdDev: stats.stdDev || 0,
+        count: stats.count || 0,
+        range: (stats.max - stats.min) || 0
+    }));
+
+    return {
+        avgScoreVsCount: calculateCorrelation(
+            data.map(d => d.avgScore),
+            data.map(d => d.count)
+        ),
+        avgScoreVsStdDev: calculateCorrelation(
+            data.map(d => d.avgScore),
+            data.map(d => d.stdDev)
+        ),
+        countVsRange: calculateCorrelation(
+            data.map(d => d.count),
+            data.map(d => d.range)
+        )
+    };
+};
+
+const calculateCorrelation = (x, y) => {
+    const n = x.length;
+    if (n === 0) return 0;
+
+    const sumX = x.reduce((a, b) => a + b, 0);
+    const sumY = y.reduce((a, b) => a + b, 0);
+    const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
+    const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
+    const sumY2 = y.reduce((sum, yi) => sum + yi * yi, 0);
+
+    const numerator = n * sumXY - sumX * sumY;
+    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+
+    return denominator === 0 ? 0 : numerator / denominator;
+};

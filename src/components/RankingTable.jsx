@@ -1,225 +1,65 @@
-import { useState, useMemo } from 'react';
+import React from 'react';
 import { useData } from '../context/DataContext';
 import { getRanking } from '../utils/analytics';
-import './RankingTable.css';
 
 const RankingTable = () => {
-    const { getFilteredStudents, getUniqueValues } = useData();
-    const [sortBy, setSortBy] = useState('ranking');
-    const [sortOrder, setSortOrder] = useState('asc');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCareer, setSelectedCareer] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 20;
-
+    const { getFilteredStudents } = useData();
     const students = getFilteredStudents();
-    const careers = getUniqueValues('carrera');
+    const ranking = getRanking(students, null).slice(0, 10); // Top 10
 
-    // Apply search and career filter
-    const filteredStudents = useMemo(() => {
-        let filtered = [...students];
-
-        if (selectedCareer) {
-            filtered = filtered.filter(s => s.carrera === selectedCareer);
-        }
-
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(s => {
-                const nombre = (s.nombre || '').toLowerCase();
-                const apellido = (s.apellido || '').toLowerCase();
-                const dni = (s.dni || '').toString().toLowerCase();
-                return nombre.includes(query) || apellido.includes(query) || dni.includes(query);
-            });
-        }
-
-        return filtered;
-    }, [students, selectedCareer, searchQuery]);
-
-    // Get ranking
-    const ranking = getRanking(filteredStudents, selectedCareer || null);
-
-    // Sort
-    const sortedData = useMemo(() => {
-        const sorted = [...ranking];
-
-        sorted.sort((a, b) => {
-            let aVal = a[sortBy];
-            let bVal = b[sortBy];
-
-            // Handle strings
-            if (typeof aVal === 'string') {
-                aVal = aVal.toLowerCase();
-                bVal = (bVal || '').toLowerCase();
-            }
-
-            if (sortOrder === 'asc') {
-                return aVal > bVal ? 1 : -1;
-            } else {
-                return aVal < bVal ? 1 : -1;
-            }
-        });
-
-        return sorted;
-    }, [ranking, sortBy, sortOrder]);
-
-    // Pagination
-    const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-    const paginatedData = sortedData.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
-    const handleSort = (column) => {
-        if (sortBy === column) {
-            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortBy(column);
-            setSortOrder('asc');
-        }
+    const getMedalBg = (position) => {
+        if (position === 1) return 'bg-[#ffd700]/20 text-[#ffd700]'; // Gold
+        if (position === 2) return 'bg-[#c0c0c0]/20 text-[#c0c0c0]'; // Silver
+        if (position === 3) return 'bg-[#cd7f32]/20 text-[#cd7f32]'; // Bronze
+        return 'bg-white/5 text-white/50';
     };
 
-    const handlePageChange = (page) => {
-        setCurrentPage(Math.min(Math.max(1, page), totalPages));
-    };
-
-    if (students.length === 0) {
+    if (ranking.length === 0) {
         return (
-            <div className="ranking-table glass-card">
-                <div className="no-data">
-                    <p>📋 No hay datos disponibles</p>
+            <div className="overflow-x-auto rounded-3xl border border-white/5">
+                <div className="text-center text-text-secondary py-12 bg-card-dark">
+                    📋 No hay datos disponibles
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="ranking-table glass-card">
-            <div className="table-header">
-                <h3>🏆 Ranking de Estudiantes</h3>
-
-                <div className="table-controls">
-                    <input
-                        type="text"
-                        placeholder="Buscar por nombre o DNI..."
-                        value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="search-input"
-                    />
-
-                    <select
-                        value={selectedCareer}
-                        onChange={(e) => {
-                            setSelectedCareer(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="career-filter"
-                    >
-                        <option value="">Todas las Carreras</option>
-                        {careers.map(career => (
-                            <option key={career} value={career}>{career}</option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-
-            <div className="table-info">
-                <p>Mostrando {paginatedData.length} de {sortedData.length} estudiantes</p>
-            </div>
-
-            <div className="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th onClick={() => handleSort('ranking')} className="sortable">
-                                Puesto {sortBy === 'ranking' && (sortOrder === 'asc' ? '↑' : '↓')}
-                            </th>
-                            <th onClick={() => handleSort('nombre')} className="sortable">
-                                Nombre {sortBy === 'nombre' && (sortOrder === 'asc' ? '↑' : '↓')}
-                            </th>
-                            <th onClick={() => handleSort('dni')} className="sortable">
-                                DNI {sortBy === 'dni' && (sortOrder === 'asc' ? '↑' : '↓')}
-                            </th>
-                            <th onClick={() => handleSort('carrera')} className="sortable">
-                                Carrera {sortBy === 'carrera' && (sortOrder === 'asc' ? '↑' : '↓')}
-                            </th>
-                            <th onClick={() => handleSort('puntaje')} className="sortable">
-                                Puntaje {sortBy === 'puntaje' && (sortOrder === 'asc' ? '↑' : '↓')}
-                            </th>
+        <div className="overflow-x-auto rounded-3xl border border-white/5">
+            <table className="w-full text-left border-collapse">
+                <thead>
+                    <tr className="bg-white/5 text-text-secondary text-sm">
+                        <th className="p-4 font-medium pl-6">Puesto</th>
+                        <th className="p-4 font-medium">Código</th>
+                        <th className="p-4 font-medium">Carrera</th>
+                        <th className="p-4 font-medium">Sede</th>
+                        <th className="p-4 font-medium text-right pr-6">Puntaje</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 bg-card-dark text-white text-sm">
+                    {ranking.map((student, index) => (
+                        <tr key={student.id || index} className="hover:bg-white/5 transition-colors group">
+                            <td className="p-4 pl-6">
+                                <div className={`size-8 rounded-full flex items-center justify-center font-bold ${getMedalBg(student.ranking)}`}>
+                                    {student.ranking}
+                                </div>
+                            </td>
+                            <td className="p-4 font-mono text-white/80">
+                                {student.dni || `2024-${10000 + index}`}
+                            </td>
+                            <td className="p-4 font-medium">
+                                {student.carrera || 'Sin carrera'}
+                            </td>
+                            <td className="p-4 text-white/70">
+                                Abancay
+                            </td>
+                            <td className={`p-4 text-right font-bold pr-6 ${student.ranking <= 3 ? 'text-primary' : 'text-white'}`}>
+                                {student.puntaje?.toFixed(3) || '0.000'}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {paginatedData.map((student, index) => (
-                            <tr key={student.id || index} className={student.ranking <= 3 ? 'top-rank' : ''}>
-                                <td className="rank-cell">
-                                    <div className="rank-badge">
-                                        {student.ranking <= 3 && <span className="medal">🏅</span>}
-                                        #{student.ranking}
-                                    </div>
-                                </td>
-                                <td className="name-cell">
-                                    {student.nombre || 'Sin nombre'} {student.apellido || ''}
-                                </td>
-                                <td>{student.dni || '-'}</td>
-                                <td className="career-cell">
-                                    <span className="career-tag">{student.carrera || 'Sin carrera'}</span>
-                                </td>
-                                <td className="score-cell">
-                                    <strong>{student.puntaje?.toFixed(2) || '0.00'}</strong>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {totalPages > 1 && (
-                <div className="pagination">
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="btn-secondary"
-                    >
-                        ← Anterior
-                    </button>
-
-                    <div className="page-numbers">
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                            let pageNum;
-                            if (totalPages <= 5) {
-                                pageNum = i + 1;
-                            } else if (currentPage <= 3) {
-                                pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 2) {
-                                pageNum = totalPages - 4 + i;
-                            } else {
-                                pageNum = currentPage - 2 + i;
-                            }
-
-                            return (
-                                <button
-                                    key={pageNum}
-                                    onClick={() => handlePageChange(pageNum)}
-                                    className={currentPage === pageNum ? 'active' : ''}
-                                >
-                                    {pageNum}
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="btn-secondary"
-                    >
-                        Siguiente →
-                    </button>
-                </div>
-            )}
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 };
