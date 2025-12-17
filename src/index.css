@@ -1,7 +1,4 @@
-﻿/* ====================================
-   UNAMBA Analytics Dashboard - Design System
-   Clean Minimal Light Theme
-   ==================================== */
+﻿
 @import "tailwindcss";
 
 * {
@@ -23,10 +20,13 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom Scrollbar - Minimal */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
+}
+
+button{
+  cursor: pointer;
 }
 
 ::-webkit-scrollbar-track {
@@ -42,13 +42,11 @@ body {
   background: #d1d5db;
 }
 
-/* Glass Effect Utility */
 .glass-effect {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
 }
 
-/* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.2;
@@ -56,7 +54,6 @@ h1, h2, h3, h4, h5, h6 {
   color: #111827;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
