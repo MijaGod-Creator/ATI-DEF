@@ -120,7 +120,7 @@ export const getScoreDistribution = (students, bins = 10) => {
         });
     }
 
-    return distribution;
+    return distribution; //const estudiantes = [{ nombre: "A", puntaje: 10 },{ nombre: "B", puntaje: 20 },
 };
 
 

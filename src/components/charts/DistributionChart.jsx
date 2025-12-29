@@ -125,7 +125,7 @@ const DistributionChart = ({ bins = 10 }) => {
                 <h3 className="chart-title">Distribución de Puntajes</h3>
                 <p className="chart-subtitle">Frecuencia de estudiantes por rango de puntaje</p>
             </div>
-            <div className="h-[400px]">
+            <div className="h-100">
                 <Line data={data} options={options} />
             </div>
         </div>

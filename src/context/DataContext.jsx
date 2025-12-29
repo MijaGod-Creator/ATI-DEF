@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { normalizeStudentData, mergeSheets, validateStudentData } from '../utils/excelParser';
@@ -28,6 +29,23 @@ export const DataProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const selectSheet = useCallback((sheetName, data = rawData) => {
+        if (!data || !data.sheets[sheetName]) {
+            setError(`Sheet "${sheetName}" not found`);
+            return;
+        }
+
+        setSelectedSheet(sheetName);
+        const normalized = normalizeStudentData(data.sheets[sheetName].data);
+
+        const validation = validateStudentData(normalized);
+        if (!validation.isValid) {
+            console.warn('Data validation warnings:', validation.warnings);
+        }
+
+        setStudents(normalized);
+    }, [rawData]);
+
     const loadData = useCallback((parsedData) => {
         try {
             setIsLoading(true);
@@ -49,24 +67,7 @@ export const DataProvider = ({ children }) => {
             setError(`Error loading data: ${err.message}`);
             setIsLoading(false);
         }
-    }, [navigate]);
-
-    const selectSheet = useCallback((sheetName, data = rawData) => {
-        if (!data || !data.sheets[sheetName]) {
-            setError(`Sheet "${sheetName}" not found`);
-            return;
-        }
-
-        setSelectedSheet(sheetName);
-        const normalized = normalizeStudentData(data.sheets[sheetName].data);
-
-        const validation = validateStudentData(normalized);
-        if (!validation.isValid) {
-            console.warn('Data validation warnings:', validation.warnings);
-        }
-
-        setStudents(normalized);
-    }, [rawData]);
+    }, [navigate, selectSheet]);
 
     const mergeAllSheets = useCallback(() => {
         if (!rawData) return;

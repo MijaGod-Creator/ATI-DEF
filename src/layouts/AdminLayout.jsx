@@ -40,7 +40,7 @@ const AdminLayout = () => {
               to="/admin/resumen"
               className={`group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive('/admin/resumen')
-                  ? 'bg-gray-100 text-gray-900'
+                  ? 'bg-blue-500 text-white'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -51,7 +51,7 @@ const AdminLayout = () => {
               to="/admin/graficos"
               className={`group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive('/admin/graficos')
-                  ? 'bg-gray-100 text-gray-900'
+                  ? 'bg-blue-500 text-white'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -62,23 +62,12 @@ const AdminLayout = () => {
               to="/admin/ranking"
               className={`group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive('/admin/ranking')
-                  ? 'bg-gray-100 text-gray-900'
+                  ? 'bg-blue-500 text-white'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
               <Trophy className="h-4 w-4" />
               Ranking
-            </Link>
-            <Link
-              to="/admin/comparacion"
-              className={`group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                isActive('/admin/comparacion')
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <GitCompare className="h-4 w-4" />
-              Comparación
             </Link>
           </nav>
         </div>
@@ -107,13 +96,15 @@ const AdminLayout = () => {
 
         <main className="flex-1 overflow-y-auto bg-gray-50 p-6 mx-auto w-full max-w-7xl">
           <Outlet />
-        </main>
 
-        <footer className="border-t border-gray-200 bg-white px-6 py-3">
+             <footer className="border-t border-gray-200 bg-white px-6 py-3">
           <p className="text-xs text-gray-500 flex items-center justify-center gap-2">
             UNAMBA Análisis <Minus className="h-3 w-3" /> Dashboard © 2025 | Sistema de Análisis de Admisión
           </p>
         </footer>
+        </main>
+
+     
       </div>
     </div>
   );

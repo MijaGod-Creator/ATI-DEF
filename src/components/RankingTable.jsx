@@ -15,7 +15,6 @@ const RankingTable = () => {
     const students = getFilteredStudents();
     const careers = getUniqueValues('carrera');
 
-    // Apply search and career filter
     const filteredStudents = useMemo(() => {
         let filtered = [...students];
 
@@ -36,10 +35,8 @@ const RankingTable = () => {
         return filtered;
     }, [students, selectedCareer, searchQuery]);
 
-    // Get ranking
     const ranking = getRanking(filteredStudents, selectedCareer || null);
 
-    // Sort
     const sortedData = useMemo(() => {
         const sorted = [...ranking];
 
@@ -47,7 +44,6 @@ const RankingTable = () => {
             let aVal = a[sortBy];
             let bVal = b[sortBy];
 
-            // Handle strings
             if (typeof aVal === 'string') {
                 aVal = aVal.toLowerCase();
                 bVal = (bVal || '').toLowerCase();
@@ -63,7 +59,6 @@ const RankingTable = () => {
         return sorted;
     }, [ranking, sortBy, sortOrder]);
 
-    // Pagination
     const totalPages = Math.ceil(sortedData.length / itemsPerPage);
     const paginatedData = sortedData.slice(
         (currentPage - 1) * itemsPerPage,

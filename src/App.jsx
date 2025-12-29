@@ -5,7 +5,6 @@ import HomePage from './pages/HomePage';
 import ResumenPage from './pages/ResumenPage';
 import GraficosPage from './pages/GraficosPage';
 import RankingPage from './pages/RankingPage';
-import ComparacionPage from './pages/ComparacionPage';
 
 function ProtectedRoute({ children }) {
   const { hasData } = useData();
@@ -33,7 +32,6 @@ function AppContent() {
         <Route path="resumen" element={<ResumenPage />} />
         <Route path="graficos" element={<GraficosPage />} />
         <Route path="ranking" element={<RankingPage />} />
-        <Route path="comparacion" element={<ComparacionPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

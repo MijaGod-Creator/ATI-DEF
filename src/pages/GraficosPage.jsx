@@ -11,8 +11,6 @@ const GraficosPage = () => {
       </div>
 
       <div className="space-y-8">
-        <TopStudentsChart count={15} />
-        <CareerScoresChart />
         <DistributionChart bins={12} />
       </div>
     </div>

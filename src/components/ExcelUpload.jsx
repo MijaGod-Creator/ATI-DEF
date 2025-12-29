@@ -45,7 +45,6 @@ const ExcelUpload = () => {
     };
 
     const handleFile = async (file) => {
-        // Validate file type
         const validTypes = [
             'application/vnd.ms-excel',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -65,7 +64,6 @@ const ExcelUpload = () => {
 
             setUploadProgress({ fileName: file.name, status: 'success' });
 
-            // Clear progress after 3 seconds
             setTimeout(() => setUploadProgress(null), 3000);
         } catch (error) {
             console.error('Error parsing file:', error);
